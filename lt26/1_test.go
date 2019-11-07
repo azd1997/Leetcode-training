@@ -1,11 +1,16 @@
 package lt26
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
-var tests = []struct{
+type test struct {
 	nums []int
 	len int
-}{
+}
+
+var tests = []test{
 	// 题给示例
 	{[]int{1,1,2}, 2},
 	{[]int{0, 0, 1,1,1,2,2,3,3,4}, 5},
@@ -73,8 +78,9 @@ func TestSol_1_1(t *testing.T) {
 }
 
 func BenchmarkSol_1_1(b *testing.B) {
-	for i:=0; i<200000;i++ {
-		for _, test := range tests {
+	for i:=0; i<b.N;i++ {
+		tests1 := tests
+		for _, test := range tests1 {
 			ans := Sol_1_1(test.nums)
 			if test.len != ans {
 				b.Errorf("测试样例： %v, 本应得到： %d, 实际得到： %d\n", test.nums, test.len, ans)
@@ -94,8 +100,9 @@ func TestSol_1_2(t *testing.T) {
 }
 
 func BenchmarkSol_1_2(b *testing.B) {
-	for i:=0; i<200000;i++ {
-		for _, test := range tests {
+	for i:=0; i<b.N;i++ {
+		tests1 := tests
+		for _, test := range tests1 {
 			ans := Sol_1_2(test.nums)
 			if test.len != ans {
 				b.Errorf("测试样例： %v, 本应得到： %d, 实际得到： %d\n", test.nums, test.len, ans)
@@ -103,4 +110,41 @@ func BenchmarkSol_1_2(b *testing.B) {
 		}
 	}
 
+}
+
+func TestSol_1_3(t *testing.T) {
+	for _, tt := range tests {
+		nums1 := append([]int{}, tt.nums...)	// 因为nums被修改了
+		ans := Sol_1_3(tt.nums)
+		if tt.len != ans {
+			t.Errorf("测试样例： %v, 本应得到： %d, 实际得到： %d\n", nums1, tt.len, ans)
+		}
+		t.Logf("测试样例： %v, 本应得到： %d, 实际得到： %d\n", nums1, tt.len, ans)
+	}
+}
+
+func BenchmarkSol_1_3(b *testing.B) {
+
+	for i:=0; i<b.N;i++ {
+		tests1 := append([]test{}, tests...)
+		for _, tt := range tests1 {
+			nums1 := append([]int{}, tt.nums...)	// 因为nums被修改了
+			ans := Sol_1_3(tt.nums)
+			if tt.len != ans {
+				b.Errorf("测试样例： %v, 本应得到： %d, 实际得到： %d\n", nums1, tt.len, ans)
+			}
+		}
+	}
+}
+
+// 解法三中append中使用了nums[i+1:]，显然当i=len(nums)-1时，应该会标称nums[len]，疑惑的是这种时候应该是数组索引越界了
+func TestSlice(t *testing.T) {
+	slice := []int{0,1,2,3}
+	//fmt.Println(slice[4])
+	slice = append([]int{1,2,3}, slice[4:]...)
+	fmt.Println(slice)
+	//slice = append([]int{1,2,3}, slice[5:]...)
+	//fmt.Println(slice)
+	slice = append([]int{1,2,3}, slice[:0]...)
+	fmt.Println(slice)
 }

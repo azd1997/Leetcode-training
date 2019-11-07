@@ -16,7 +16,7 @@ func Sol_1_1(nums []int) int {
 
 	// 这里不检查排序数组为空的情况，为空还叫啥排序数组
 
-	var index int		// item存此前最大的值, index为item在数组中的下标，默认值为0
+	var index int
 	for i:=0; i<len(nums); i++ {
 		if nums[i] > nums[index] {	//默认从小到大排好序的数组，所以i一定比index大，除了少数情况会等于
 			if i > index + 1 {  // 说明中间有重复数字，只要所有数字有一个数字被重复了，都需要这样判断。这可以是下一版本的优化点，
@@ -62,4 +62,33 @@ func Sol_1_2(nums []int) int {
 	}
 
 	return index+1
+}
+
+// 在解法1基础上简化
+func Sol_1_3(nums []int) int {
+
+	// 这里不检查排序数组为空的情况，为空还叫啥排序数组
+
+	var index int
+	for i:=1; i<len(nums); i++ {
+		if nums[i] > nums[i-1] {
+			index++
+			nums[index] = nums[i]
+		}
+		// 若现在的数没有比前缀不重复子数组最大值大，那说明重复了，啥也不干
+	}
+
+	return index+1
+}
+
+// 倒序遍历，数组前缩
+func Sol_1_4(nums []int) int {
+	// 倒序遍历，遇同则将数组前缩
+	for i:=len(nums)-1; i>0; i-- {      // l-1, l-2, ..., 2, 1, (0)
+
+		if nums[i] == nums[i-1] {
+			nums = append(nums[:i], nums[i+1:]...)
+		}
+	}
+	return len(nums)
 }
