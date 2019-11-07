@@ -173,3 +173,23 @@ func TestSol_1_7(t *testing.T) {
 		}
 	}
 }
+
+func TestSol_1_8(t *testing.T) {
+
+	for _, tt := range tests {
+		t_nums := append([]int{}, tt.nums...)
+		Sol_1_8(tt.nums, tt.k)
+		var err error
+		for i := range tt.nums {
+			if tt.nums[i] != tt.new[i] {
+				err = errors.New("出错")
+				break
+			}
+		}
+		if err == nil {
+			t.Logf("PASS ==== 测试样例： %v, 旋转次数： %d, 应该变成： %v, 结果变成： %v\n", t_nums, tt.k, tt.new, tt.nums)
+		} else {
+			t.Errorf("WRONG ==== 测试样例： %v, 旋转次数： %d, 应该变成： %v, 结果变成： %v\n", t_nums, tt.k, tt.new, tt.nums)
+		}
+	}
+}
