@@ -1,332 +1,214 @@
-package lt88
+package lt21
 
-import "sort"
+import "fmt"
 
-// 合并两个有序数组
-// 假设nums1(长度m)空间足够，nums2(长度n)并入nums1
+//输入：1->2->4, 1->3->4
+//输出：1->1->2->3->4->4
 
 // 解法：
-// 1. 最蠢最暴力解法：遍历nums2,将nums2[i]从前向后与nums1[j]比较，当nums2[i]>nums1[j]时插到其后
-// 		（或者当nums2[i]<nums1[j]时插到其前，这种少一点数据搬迁工作量，而多了一些数据大小比较的工作量）
-// 		时间复杂度O(n*m/2*m/2) 空间复杂度O(1)
-// 		n是nums2遍历循环，第一个m是遍历nums1大小比较，第二个m是找到插入位置后插入操作
-// 2. 在解法1基础上优化一些：用一个变量index标记nums2[i]插入到nums1的位置，nums2[i+1]就直接从这个位置起开始比较nums1的数据
-//		时间复杂度比较难求，但显然比解法1高效许多
-// 3. 在解法2基础上加上二分查找比较，比一个一个比较快多了，毕竟二分查找本身时间复杂度是O(logn)
-// 4. 标记加二分查找使得找到插入位置变得高效，但是还有数据搬迁仍然非常耗时。在解法4中引入辅助数组a=[]int。
-//		这个辅助数组有两种用法：
-// 		4.1 如果不要求nums1指针不变，直接用a=[m+n]int存合并后的有序数组，然后再让nums1指向a。
-// 			这种做法下如果要保证nums1指针不变，那么就将a数据拷贝给nums1
-// 		4.2 如果要求nums1要求指针不变，除了上面的4.1后一种做法外，还以用这个辅助数组来存储nums1和nums2(这里a可以是一个m+n的，也可以是拆成两个)
-// 			各数据的新下标位置并不实际搬移数据，等到a记录了所有数据的新位置，再计算搬移量来进行搬移
-// 5. 还能不能更快呢？
+// 首先题目没有说明头节点存不存数据，这是有问题的，下边我的解题以头节点存数据为准。
+// 1. 显然很容易想到双指针法（三指针法），从前向后遍历取两链表“头部”比较，小者先入新链表
 
-// -------------------------------------------------------------------------------------
-// 参考官方题解等，有以下方法：
-// 1. 合并两个数组再排序
-
-//nums1 = [1,2,3,0,0,0], m = 3
-//nums2 = [2,5,6],       n = 3
-//
-//输出: [1,2,2,3,5,6]
-
-// 限于时间精力，除了朴素合并再排序外，只实现原地解法及时间复杂度较低的解法
-
-// 合并两个数组再排序
-// 时间复杂度O((m+n)log(m+n))，空间复杂度O(1)
-// ！！！没有利用原数组有序这一特性，所以有提升空间
-//59/59 cases passed (0 ms)
-//Your runtime beats 100 % of golang submissions
-//Your memory usage beats 94.16 % of golang submissions (3.6 MB)
-func Sol_1_1(nums1, nums2 []int, m, n int) {
-
-	// 不检查m,n是否是nums1,nums2长度，题已给定
-
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		//nums1 = append(nums1, nums2...)		// 原地
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
-		}
-		return
-	}
-	if n == 0 {
-		return
-	}
-
-	// 一般情况下合并两数组再重新排序
-	//nums1 = append(nums1, nums2...)
-	for i:=m; i<n+m; i++ {
-		nums1[i] = nums2[i-m]
-	}
-	sort.Sort(sort.IntSlice(nums1))		// 时间复杂度O((m+n)log(m+n))且不稳定
+// 假设第一个节点是存了数据的
+type ListNode struct {
+	Val int
+	Next *ListNode
 }
 
-// 双指针从前向后
-// 每次从nums1原有效数据的备份nums1_1数组和nums2的“头部”（已经填入nums1的不计）取出数据进行比较，小者先填入nums1。
-// 如果相等，随便哪个先入，这里让nums1_1的“头部”值先入
-// 时间复杂度O(m+n), 空间复杂度O(m)
-//59/59 cases passed (0 ms)
-//Your runtime beats 100 % of golang submissions
-//Your memory usage beats 75.32 % of golang submissions (3.6 MB)
-func Sol_1_2(nums1, nums2 []int, m, n int) {
+// 三指针法
+func Sol_1_1(l1, l2 *ListNode) *ListNode {
 
-	// 不检查m,n是否是nums1,nums2长度，题已给定
-
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		//nums1 = append(nums1, nums2...)		// 原地
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
-		}
-		return
+	// 边界条件（包含了 l1==0 && l2==0 ）
+	if l1 == nil {
+		return l2
 	}
-	if n == 0 {
-		return
+	if l2 == nil {
+		return l1
 	}
 
-	// 一般情况下
-	nums1_1 := append([]int{}, nums1[:m]...)	// 将nums1前m个有效数据拷贝至nums1_1
+	var l3 *ListNode	// 返回的链表头指针
+	p1, p2 := l1, l2	// l1,l2的两个“头部”指针
 
-	var p1, p2 int	// p1,p2分别代表nums1_1, nums2 "头部"数据的下标
-	for i:=0; i<m+n; i++ {
-		// p1,p2有个限制
-		if p1 == m {	// 如果p1先到底，则将p2后续直接复制过来
-			// p1, p2之前各有p1,p2个数据已经填到nums1,所以nums1现在有的应该是p1+p2个，那么剩下的就是nums1[p1+p2:]
-			copy(nums1[p1+p2:], nums2[p2:])
-			break
-		}
-		if p2 == n {
-			copy(nums1[p1+p2:], nums1_1[p1:])
+	// 先生成l3第一个节点
+	if l1.Val <= l2.Val {
+		l3 = l1
+		p1 = p1.Next
+	} else {
+		l3 = l2
+		p2 = p2.Next
+	}
+
+	// 接下来开始向后扫描两个链表的值
+	p3 := l3
+	for {
+		// 有一方先扫完了，就退出循环
+		if p1 == nil || p2 == nil {
 			break
 		}
 
-		if nums1_1[p1] <= nums2[p2] {
-			nums1[i] = nums1_1[p1]
-			p1++	// p1后移
+		// 比较然后填充数据
+		if p1.Val <= p2.Val {
+			p3.Next = p1
+			p3 = p3.Next	// p3后移
+			p1 = p1.Next	// p1后移
 		} else {
-			nums1[i] = nums2[p2]
-			p2++	// p2后移
+			p3.Next = p2
+			p3 = p3.Next
+			p2 = p2.Next
 		}
-
-		// 这样写，那么最后p1p2一般会有其中一个先到末尾，就不能在继续加了，也就是有个p1<m,p2<n的限制。
-
+		//fmt.Println("测试")
 	}
-	// 最后nums1就得到排好序的合并数组了
+
+	if p1 != nil {
+		// 直接将l1剩余的这些接到l3
+		p3.Next = p1
+	}
+	if p2 != nil {
+		// 直接将l2剩余的这些接到l3
+		p3.Next = p2
+	}
+
+	return l3
 }
 
-// Sol_1_2中的循环语句也可以进行改写，如下所示，本质上两者是一个方法
-//59/59 cases passed (0 ms)
+// 三指针法优化，处理连续相同数字节点
+// 对上面解法优化一下：两个链表都会有连续相等值情况，这时直接批量接到l3会更高效：节省了赋值次数和比较次数
+// 所以加了两个指针用来记录相同数字开始的地方
+// 时间复杂度O(min(m,n)), 空间O(1)
+// 208/208 cases passed (0 ms)
 //Your runtime beats 100 % of golang submissions
-//Your memory usage beats 69.81 % of golang submissions (3.6 MB)
-func Sol_1_3(nums1, nums2 []int, m, n int) {
+//Your memory usage beats 97.85 % of golang submissions (2.5 MB)
+func Sol_1_2(l1, l2 *ListNode) *ListNode {
 
-	// 不检查m,n是否是nums1,nums2长度，题已给定
+	// 边界条件（包含了 l1==0 && l2==0 ）
+	if l1 == nil {
+		return l2
+	}
+	if l2 == nil {
+		return l1
+	}
 
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		//nums1 = append(nums1, nums2...)		// 原地
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
+	var l3 *ListNode	// 返回的链表头指针
+	p1, p2 := l1, l2	// l1,l2的两个“头部”指针, 不断后移
+
+	// 先生成l3第一个节点
+	if l1.Val <= l2.Val {
+		l3 = l1
+		p1 = p1.Next
+	} else {
+		l3 = l2
+		p2 = p2.Next
+	}
+
+	// 接下来开始向后扫描两个链表的值
+	p3 := l3
+	for {
+		// 有一方先扫完了，就退出循环
+		if p1 == nil || p2 == nil {
+			break
 		}
-		return
-	}
-	if n == 0 {
-		return
-	}
 
-	// 一般情况下
-	nums1_1 := append([]int{}, nums1[:m]...)	// 将nums1前m个有效数据拷贝至nums1_1
+		// 现在 p1, p2保证非空
+		switch {
+		case p1.Val == p2.Val:
+			// l1,l2都向后去寻找新数值，并返回新数值的前一个节点
+			p3.Next = p1
+			p1 = findLarger(p1)		// p1可能后移了
+			p3 = p1							// p3此时的next指针非空，但不管，后边会覆盖
+			p1 = p1.Next					// p1后移至待比较数值位置
+			p3.Next = p2
+			p2 = findLarger(p2)
+			p3 = p2							// p3此时的next指针非空，但不管，后边会覆盖
+			p2 = p2.Next					// p2后移至待比较数值位置
+			fmt.Println("11111")
 
-	var p1, p2 int	// p1,p2分别代表nums1_1, nums2 "头部"数据的下标
-	// p1,p2未到末尾之前，两个数组的“头部”数据都需要进行大小比较
-	for p1<m && p2<n {
-		if nums1_1[p1] <= nums2[p2] {
-			nums1[p1+p2] = nums1_1[p1]		// 在把当前这个数据加到nums1之前，nums1已经有了p1+p2个数据，所以nums1即将填充的数据是nums[p1+p2]
-			p1++	// p1后移
-		} else {
-			nums1[p1+p2] = nums2[p2]
-			p2++	// p2后移
+		case p1.Val < p2.Val:
+			// l1向后去寻找新数值，并返回新数值的前一个节点
+			p3.Next = p1
+			p1 = findLarger(p1)
+			p3 = p1
+			p1 = p1.Next
+			fmt.Println("222222")
+		case p1.Val > p2.Val:
+			// l2向后去寻找新数值，并返回新数值的前一个节点
+			p3.Next = p2
+			p2 = findLarger(p2)
+			p3 = p2
+			p2 = p2.Next
+			fmt.Println("33333333")
 		}
+
 	}
 
-	// 退出循环之后，p1, p2可能有其中之一还没到末尾
-	if p1 < m {	// 如果p1先到底，则将p2后续直接复制过来
-		copy(nums1[p1+p2:], nums1_1[p1:])
+	if p1 != nil {
+		// 直接将l1剩余的这些接到l3
+		p3.Next = p1
 	}
-	if p2 < n {
-		copy(nums1[p1+p2:], nums2[p2:])
+	if p2 != nil {
+		// 直接将l2剩余的这些接到l3
+		p3.Next = p2
 	}
-	// 最后nums1就得到排好序的合并数组了
+
+	return l3
 }
 
-// 其实Sol_1_3还有可优化的的地方。如果遍历到的两个“头部数据”相等的情况很多，可以一次将两个数据都填到nums1去
-//59/59 cases passed (0 ms)
-//Your runtime beats 100 % of golang submissions
-//Your memory usage beats 75.32 % of golang submissions (3.6 MB)
-func Sol_1_4(nums1, nums2 []int, m, n int) {
+// 找出更大数之前那个节点
+// 3 -> 3 -> 3 -> 5 返回最后那个 3 的节点
+// nodeVal为node的值
+// 注意传入的p本身就是一份拷贝，绝对不能修改p.Next，只能修改p， 避免破坏原本的链表
+func findLarger(p *ListNode) *ListNode {
 
-	// 不检查m,n是否是nums1,nums2长度，题已给定
+	for {
 
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		//nums1 = append(nums1, nums2...)		// 原地
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
+		// 有种情况是p已经是末尾
+		if p.Next == nil {
+			return p
 		}
-		return
-	}
-	if n == 0 {
-		return
-	}
 
-	// 一般情况下
-	nums1_1 := append([]int{}, nums1[:m]...)	// 将nums1前m个有效数据拷贝至nums1_1
-
-	var p1, p2 int	// p1,p2分别代表nums1_1, nums2 "头部"数据的下标
-	// p1,p2未到末尾之前，两个数组的“头部”数据都需要进行大小比较
-	for p1<m && p2<n {
-		if nums1_1[p1] == nums2[p2] {
-			nums1[p1+p2], nums1[p1+p2+1] = nums2[p2], nums2[p2]
-			p1++
-			p2++
-		} else if nums1_1[p1] < nums2[p2] {
-			nums1[p1+p2] = nums1_1[p1]
-			p1++	// p1后移
-		} else {
-			nums1[p1+p2] = nums2[p2]
-			p2++	// p2后移
+		if p.Next.Val > p.Val {
+			break
 		}
-	}
 
-	// 退出循环之后，p1, p2可能有其中之一还没到末尾
-	if p1 < m {	// 如果p1先到底，则将p2后续直接复制过来
-		copy(nums1[p1+p2:], nums1_1[p1:])
+		// p.Next.Val == p.Val
+		p = p.Next
 	}
-	if p2 < n {
-		copy(nums1[p1+p2:], nums2[p2:])
-	}
-	// 最后nums1就得到排好序的合并数组了
+	// 循环结束p就是要求的节点
+	return p
 }
 
-// 双指针法，从后向前。
-// Sol_1_2~Sol_1_4都使用了一个额外的数组，但是nums1数组本身后边原本是零值的，不需要保存，如果从后向前填充，则不需要额外数组
-// 时间O(n), 空间O(1)
-//59/59 cases passed (0 ms)
-//Your runtime beats 100 % of golang submissions
-//Your memory usage beats 94.16 % of golang submissions (3.6 MB)
-func Sol_1_5(nums1, nums2 []int, m, n int) {
+// -----------------------------------------------------------------------------------
+// 暂时想不到继续优化的方向，开始看题解。
+// 看了最高赞的两个题解，总共两种方法：递归和迭代。迭代的做法就是我的Sol_1_1.
+// 而且有一点注意的是： 其他的题解中所得链表的第一个节点都是无意义的值。好奇怪，那我的思路是怎么通过测试的？
 
-	// 不检查m,n是否是nums1,nums2长度，题已给定
+// 那么接下来实现下递归方案
+// 我继续按我的思路，所得的链表第一个节点存有意义数值。
 
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
-		}
-		return
+// 递归方法
+//208/208 cases passed (4 ms)
+//Your runtime beats 72.85 % of golang submissions
+//Your memory usage beats 68.42 % of golang submissions (2.5 MB)
+// 为什么递归明明和Sol_1_1的比较流程看上去一样，但内存占用变多，消耗时间也更多呢？
+// 原因在于边界条件这里，如果说Sol_1_1耗时O(min(m+n))，那么这个耗时可能可以算是O(1.5*min(m,n))
+// 递归方法每一次递归都要重新判断l1,l2是否为nil
+// 不对不对，迭代一样没次都要比较链表是否遍历到尾部，也就是p1,p2是否为nil!
+// 希望有知道的能留言为我解惑一二。
+func Sol_1_3(l1, l2 *ListNode) *ListNode {
+
+	// 边界条件（包含了 l1==0 && l2==0 ）
+	if l1 == nil {
+		return l2
 	}
-	if n == 0 {
-		return
-	}
-
-	// 一般情况下,从后向前遍历
-	p1 := m-1	// p1,p2分别代表nums1, nums2 原本状态中有效数据最后一个的下标，每次当最后这个数据被填充到nums1末尾时，p1或p2前移
-	p2 := n-1
-	// p1,p2未到最左边之前，两个数组的“尾部”数据都需要进行大小比较
-	for p1>=0 && p2>=0 {
-		if nums1[p1] == nums2[p2] {
-			nums1[p1+p2+1], nums1[p1+p2] = nums2[p2], nums2[p2]		// (n+m-1)-(m-p1-1)-(n-p2-1) = p1+p2+1 是当前比较的大者应该填充的位置
-			p1--
-			p2--
-		} else if nums1[p1] > nums2[p2] {
-			nums1[p1+p2+1] = nums1[p1]
-			p1--	// p1前移
-		} else {
-			nums1[p1+p2+1] = nums2[p2]
-			p2--	// p2前移
-		}
+	if l2 == nil {
+		return l1
 	}
 
-	// 退出循环之后，p1, p2可能有其中之一还没到末尾.
-	// 如果是p1还没到nums1最左边（越过），则不用干什么。
-	// 如果是p2还没到nums2最左边（越过），则将其拷贝给nums1
-	if p2 >= 0 {
-		copy(nums1[:p1+p2+2], nums2[:p2+1])		// 注意go切片[a:b]右半边b是不包含的
+	// 递归
+	if l1.Val <= l2.Val {
+		l1.Next = Sol_1_3(l1.Next, l2)
+		return l1
+	} else {
+		l2.Next = Sol_1_3(l1, l2.Next)
+		return l2
 	}
-	// 最后nums1就得到排好序的合并数组了
-}
-
-// 如果觉得前面Sol_1_5中nums1填入数据的最终下标有点绕，我们可以给它一个指针p,p从n+m-1开始递减
-//59/59 cases passed (0 ms)
-//Your runtime beats 100 % of golang submissions
-//Your memory usage beats 94.16 % of golang submissions (3.6 MB)
-func Sol_1_6(nums1, nums2 []int, m, n int) {
-
-	// 不检查m,n是否是nums1,nums2长度，题已给定
-
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
-		}
-		return
-	}
-	if n == 0 {
-		return
-	}
-
-	// 一般情况下,从后向前遍历
-	p1 := m-1	// p1,p2分别代表nums1, nums2 原本状态中有效数据最后一个的下标，每次当最后这个数据被填充到nums1末尾时，p1或p2前移
-	p2 := n-1
-	p := m+n-1	// p指向两数组“尾部”数据大者将要填入的位置，递减
-	// p1,p2未到最左边之前，两个数组的“尾部”数据都需要进行大小比较
-	for p1>=0 && p2>=0 {
-		if nums1[p1] == nums2[p2] {
-			nums1[p], nums1[p-1] = nums2[p2], nums2[p2]		// (n+m-1)-(m-p1-1)-(n-p2-1) = p1+p2+1 是当前比较的大者应该填充的位置
-			p1--
-			p2--
-			p = p-2
-		} else if nums1[p1] > nums2[p2] {
-			nums1[p] = nums1[p1]
-			p1--	// p1前移
-			p--
-		} else {
-			nums1[p] = nums2[p2]
-			p2--	// p2前移
-			p--
-		}
-	}
-
-	// 退出循环之后，p1, p2可能有其中之一还没到末尾.
-	// 如果是p1还没到nums1最左边（越过），则不用干什么。
-	// 如果是p2还没到nums2最左边（越过），则将其拷贝给nums1
-	if p2 >= 0 {
-		copy(nums1[:p+1], nums2[:p2+1])		// 注意go切片[a:b]右半边b是不包含的
-	}
-	// 最后nums1就得到排好序的合并数组了
-}
-
-// -------------------------------------------------------最后再来实现下我最初的解题想法
-
-// index标记之前的插入位置，使用二分查找插入
-func Sol_1_7(nums1, nums2 []int, m, n int) {
-
-	// 不检查m,n是否是nums1,nums2长度，题已给定
-
-	// 边界条件 m=0 || n=0
-	if m == 0 {
-		for i:=0; i<n; i++ {
-			nums1[i] = nums2[i]
-		}
-		return
-	}
-	if n == 0 {
-		return
-	}
-
-	// 一般情况下,使用我前面提到的思路
-	// 遍历nums2,将nums2[i]和nums1[j]比较去插入，如果使用辅助数组来填充数，那么本质上和前面的的双指针法从前向后没区别
-
-
 }

@@ -1,9 +1,4 @@
-package lt88
-
-import (
-	"errors"
-	"testing"
-)
+package lt21
 
 type test struct {
 	nums1 []int
@@ -28,47 +23,9 @@ var tests = []test{
 
 }
 
-// Sol_1_1	第一个1代表刷题遍数，也即是文件夹下1.go; 第二个1表示解法编号
+// 测试不方便，需要自己写一个数组转链表方法
 
-func TestSol_1_1(t *testing.T) {
 
-	for _, tt := range tests {
-		t_nums1 := append([]int{}, tt.nums1...)
-		Sol_1_1(tt.nums1, tt.nums2, tt.m, tt.n)
-		var err error
-		for i := range t_nums1 {
-			if tt.nums1[i] != tt.newNums1[i] {
-				err = errors.New("出错")
-				break
-			}
-		}
-		if err == nil {
-			t.Logf("PASS ==== 测试样例：nums1=%v, nums2=%v, nums1本应变成: %v, 结果变成： %v\n", t_nums1, tt.nums2, tt.newNums1, tt.nums1)
-		} else {
-			t.Errorf("PASS ==== 测试样例：nums1=%v, nums2=%v, nums1本应变成: %v, 结果变成： %v\n", t_nums1, tt.nums2, tt.newNums1, tt.nums1)
-		}
-	}
-}
-
-func TestSol_1_2(t *testing.T) {
-
-	for _, tt := range tests {
-		t_nums1 := append([]int{}, tt.nums1...)
-		Sol_1_2(tt.nums1, tt.nums2, tt.m, tt.n)
-		var err error
-		for i := range t_nums1 {
-			if tt.nums1[i] != tt.newNums1[i] {
-				err = errors.New("出错")
-				break
-			}
-		}
-		if err == nil {
-			t.Logf("PASS ==== 测试样例：nums1=%v, nums2=%v, nums1本应变成: %v, 结果变成： %v\n", t_nums1, tt.nums2, tt.newNums1, tt.nums1)
-		} else {
-			t.Errorf("PASS ==== 测试样例：nums1=%v, nums2=%v, nums1本应变成: %v, 结果变成： %v\n", t_nums1, tt.nums2, tt.newNums1, tt.nums1)
-		}
-	}
-}
 
 
 
