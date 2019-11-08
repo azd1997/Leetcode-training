@@ -242,6 +242,8 @@ func Sol_1_8(nums []int, k int) {
 
 		for {
 			next = (current + k) % l		// 当前数据的最终位置
+
+			// 注意：这里的交换不能使用真的交换，必须保证原来那个位置数据不动
 			temp = nums[next]				// 将原next位置的数据备份
 			nums[next] = prev				// 将当前数据(prev)赋给next位置
 
