@@ -1,4 +1,4 @@
-package lt70
+package lt15
 
 import "math"
 
