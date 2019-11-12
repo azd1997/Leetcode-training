@@ -2,6 +2,10 @@ package lt622
 
 // 设计循环队列
 
+// 也可以将head和tail初始设为-1，这样的话指针的移动需要做一些调整。
+
+// 循环队列与循环双端队列实现基本一致，循环双端队列只是多了头插和尾删两个方法而已。
+
 type MyCircularQueue struct {
 	data []int
 	head, tail int
