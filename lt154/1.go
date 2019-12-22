@@ -7,6 +7,9 @@ package lt154
 
 //
 // 1. 二分查找
+//192/192 cases passed (4 ms)
+//Your runtime beats 93.14 % of golang submissions
+//Your memory usage beats 81.82 % of golang submissions (3.1 MB)
 func findMin(nums []int) int {
 
 	// 特殊情况
@@ -63,3 +66,23 @@ func findMin(nums []int) int {
 	return nums[l]
 }
 
+//
+//192/192 cases passed (4 ms)
+//Your runtime beats 93.14 % of golang submissions
+//Your memory usage beats 81.82 % of golang submissions (3.1 MB)
+func findMin2(nums []int) int {
+
+	l, r, mid := 0, len(nums)-1, 0
+
+	for r>l {
+		mid = l + (r-l)/2
+		if nums[mid] > nums[r] {
+			l = mid + 1
+		} else if nums[mid] < nums[r] {
+			r = mid
+		} else { // nums[mid] = nums[r]
+			r--
+		}
+	}
+	return nums[l]
+}
