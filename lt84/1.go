@@ -86,3 +86,39 @@ func minInInts(ints []int) (index, value int) {
 // 3. 分治解法 思路与我前面的解法一般。
 // 4. 优化的分治解法 官方题解这里用线段树代替遍历寻找区间最小值，单词查询复杂度变成O(logn)，空间因为使用了线段树，占用O(n)
 // 5. 使用栈
+
+
+// 2. 基于栈的解法
+//96/96 cases passed (12 ms)
+//Your runtime beats 78.15 % of golang submissions
+//Your memory usage beats 57.14 % of golang submissions (4.8 MB)
+func largestRectangleArea2(heights []int) int {
+
+	l := len(heights)
+
+	if l == 0 {return 0}
+	if l == 1 {return heights[0]}
+
+	// 用切片模拟栈，为了节省切片扩容时间，预设切片空间为数组长度
+	// 栈用来存heights数组中元素下标
+	stack := make([]int, 1, l)
+	stack[0] = -1		// 预填一个-1
+
+	maxArea := 0
+	var area int
+	for i:=0; i<l; i++ {
+		for stack[len(stack)-1] != -1 && heights[ stack[len(stack)-1] ] >= heights[i] {
+			area = heights[stack[len(stack)-1]] * (i - stack[len(stack)-2] - 1)
+			if area > maxArea {maxArea = area}
+			stack = stack[:len(stack)-1]
+		}
+		stack = append(stack, i)
+	}
+
+	for stack[len(stack)-1] != -1 {		// 栈未到底
+		area = heights[stack[len(stack)-1]] * (l - stack[len(stack)-2] - 1)
+		if area > maxArea {maxArea = area}
+		stack = stack[:len(stack)-1]
+	}
+	return maxArea
+}
