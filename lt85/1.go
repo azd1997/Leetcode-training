@@ -1,6 +1,10 @@
 package lt85
 
-import "fmt"
+import (
+	"fmt"
+	"math/big"
+	"strconv"
+)
 
 // 最大矩形
 // 在仅包含 '0' / '1' 的二维二进制矩阵中找出只包含 1 的最大矩形
@@ -195,6 +199,116 @@ func maximalRectangle2(matrix [][]byte) int {
 	for r:=rows-1; r>=0; r-- {
 		area = largestRectangleAreaInLt84(matrix1[r])
 		if area > maxArea {maxArea = area}
+	}
+
+	return maxArea
+}
+
+
+// 3. 位运算解法 —— 暴力解优化
+// 未能通过。
+// [["0","1","1","1","1","1","0","1","1","1","1","1","0","1","0","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1","1","1","0","1","1","1","1","1","0","0","0","1","1","0","1","1","1","0","1","1","1","1","0","0","1","1","1","0","0","0","1","1","1","0","1","1","1","1","1","1","1","1","1","1","1","1","1","0","0","1","1","1","1","0","1","1","1","1","1","1","1","1","0","0","1","0","1","0","1","0"]]
+// 由于用int64表示，位数有限制
+func maximalRectangle3(matrix [][]byte) int {
+	// 行列数
+	rows := len(matrix)
+	if rows==0 {return 0}
+	cols := len(matrix[0])	// 这里假设二维切片是等宽的
+	if cols==0 {return 0}
+
+	// 将每行转化为二进制数
+	nums := make([]int64, rows)
+	for i:=0; i<rows; i++ {
+		//nums[i], _ = binary.ReadUvarint(bytes.NewReader(matrix[i]))	这个不行
+		nums[i], _ = strconv.ParseInt(string(matrix[i]), 2, 64)
+	}
+	//fmt.Printf("nums=%v\n", nums)
+
+	var maxArea, area, j, num int
+
+	// 遍历所有行
+	for i:=0; i<rows; i++ {
+		j, num = i, int(nums[i])
+		// 将第i行 连续的 和接下来的所有行 作与运算
+		for j < rows {
+			// 与运算之后，num化为二进制中的 1， 表示从第i到第j行，可以组成矩形的那几列
+			num = num & int(nums[j])
+
+			if num == 0 {break}
+			l, curnum := 0, num
+			// 每次循环将curnum与 其左移一位 的数 作与运算
+			// 最终的循环次数 l 表示最宽的矩形宽度
+			for curnum != 0 {
+				l++
+				curnum = curnum & (curnum << 1)
+			}
+			area = l * (j-i+1)
+			if area > maxArea {maxArea = area}
+
+			j++
+		}
+	}
+
+	return maxArea
+}
+
+// 4. 解法三的改进版
+// 使用大数表示
+func maximalRectangle4(matrix [][]byte) int {
+	// 行列数
+	rows := len(matrix)
+	if rows==0 {return 0}
+	cols := len(matrix[0])	// 这里假设二维切片是等宽的
+	if cols==0 {return 0}
+
+	// 将每行转化为二进制数
+	nums := make([]big.Int, rows)
+	for i:=0; i<rows; i++ {
+		nums[i] = big.Int{}
+		nums[i].SetString(string(matrix[i]), 2)		// 不能使用 SetBytes()	我们要位操作，所以得将字符表示成二进制位先
+	}
+	fmt.Printf("nums=%v\n", nums)
+
+	var maxArea, area, j int
+	var num big.Int
+
+	// 遍历所有行
+	for i:=0; i<rows; i++ {
+		j, num = i, nums[i]
+		//fmt.Printf("num addr = %p, nums[i] addr = %p\n", &num, &nums[i])
+		// 将第i行 连续的 和接下来的所有行 作与运算
+		for j < rows {
+			// 与运算之后，num化为二进制中的 1， 表示从第i到第j行，可以组成矩形的那几列
+
+			num.And(&num, &nums[j])
+
+			fmt.Printf("j=%d, num=%v\n", j, &num)
+
+			if num.Cmp(big.NewInt(0)) == 0 {break}
+
+			bits1, bits2 := make([]big.Word, len(num.Bits())), make([]big.Word, len(num.Bits()))
+			l, curnum, curnumLsh := 0, new(big.Int).SetBits(bits1), new(big.Int).SetBits(bits2)
+			//fmt.Printf("num addr = %p, curnum addr = %p\n", &num, &curnum)
+			// 每次循环将curnum与 其左移一位 的数 作与运算
+			// 最终的循环次数 l 表示最宽的矩形宽度
+			for curnum.Cmp(big.NewInt(0)) != 0 {
+				l++
+				curnumLsh = curnum
+				fmt.Printf("num = %v, curnum = %v, curnumLsh = %v\n", &num, curnum, curnumLsh)
+				curnumLsh.Lsh(curnumLsh, 1)
+				fmt.Printf("num = %v, curnum = %v, curnumLsh = %v\n", &num, curnum, curnumLsh)
+
+				curnum.And(curnum, curnumLsh)
+				//fmt.Printf("num addr = %p, curnum addr = %p\n", &num, &curnum)
+				fmt.Printf("num = %v, curnum = %v, curnumLsh = %v\n", &num, &curnum, &curnumLsh)
+				//fmt.Printf("l=%d, curnum=%v\n", l, &curnum)
+			}
+			area = l * (j-i+1)
+			if area > maxArea {maxArea = area}
+			//fmt.Printf("num = %v, area = %d, maxArea = %d\n", num, area, maxArea)
+			//fmt.Printf("nums = %v\n", nums)
+			j++
+		}
 	}
 
 	return maxArea
