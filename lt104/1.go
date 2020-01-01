@@ -44,3 +44,18 @@ func nextLayer(node *TreeNode, depth int) int {
 		return d2
 	}
 }
+
+
+// 提交区最优答案。简洁、高效
+//39/39 cases passed (4 ms)
+//Your runtime beats 92.93 % of golang submissions
+//Your memory usage beats 61.74 % of golang submissions (4.4 MB)
+func maxDepth2(root *TreeNode) int {
+	if root == nil {return 0}
+	return max(maxDepth2(root.Left), maxDepth2(root.Right)) + 1		// +1 是深度+1
+}
+
+func max(a, b int) int {
+	if a>=b {return a}
+	return b
+}
