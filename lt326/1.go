@@ -35,7 +35,7 @@ import (
 
 // 思考：
 // 1. 最直观的解法就是使用循环或者递归，不断除3，检查每一步的余数
-// 2. 题目进阶要求不用递归或循环，这个时候一般是位操作
+// 2. 题目进阶要求不用递归或循环
 
 // 1. 循环除3. 每一步余数都必须是0，最后必须检查商为1且余数为0
 //21038/21038 cases passed (40 ms)
@@ -108,6 +108,14 @@ func isPowerOfThree5(n int) bool {
 	d := math.Dim(n1, float64(n))
 	if d < 0.0000000001 {return true}
 	return false
+}
+
+// 使用math.Mod
+// 仍然不能通过测试
+func isPowerOfThree52(n int) bool {
+	if n<1 {return false}
+	//return math.Mod(math.Log(float64(n)) / math.Log(float64(3)), 1) == 0
+	return math.Mod(math.Log(float64(n)) / math.Log(float64(3)) + math.SmallestNonzeroFloat64, 1) <= 2 * math.SmallestNonzeroFloat64
 }
 
 
