@@ -14,11 +14,24 @@ package lt191
 //601/601 cases passed (4 ms)
 //Your runtime beats 100 % of golang submissions
 //Your memory usage beats 96.39 % of golang submissions (2 MB)
-func hammingWeight(num uint32) int {
+func hammingWeight1(num uint32) int {
 	x, count := num, 0		// 不修改原num
 	for x>0 {
 		if x & 1 == 1 {count++}
 		x = x >> 1
+	}
+	return count
+}
+
+// 使用掩码，对掩码进行移位而非修改num
+func hammingWeight12(num uint32) int {
+	var mask uint32 = 1
+	count := 0
+	for i:=0; i<32; i++ {
+		if num & mask != 0 {
+			count++
+		}
+		mask = mask << 1
 	}
 	return count
 }
