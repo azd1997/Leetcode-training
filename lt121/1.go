@@ -107,7 +107,7 @@ func maxProfit2(prices []int) int {
 // 不允许交易，则不可能持有股票，-infinity用来表示不可能
 //
 //
-// 现在回到本题，本题中每天只允许交易一笔，K=1
+// 现在回到本题，本题中只允许交易一笔，K=1
 // dp[i][1][0] = max(dp[i-1][1][0], dp[i-1][1][1]+prices[i])
 // dp[i][1][1] = max(dp[i-1][1][1], dp[i-1][0][0]-prices[i])
 // 由于k=0的base case，dp[i-1][0][0] = 0
