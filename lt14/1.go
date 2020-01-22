@@ -1,6 +1,9 @@
 package lt14
 
-import "github.com/azd1997/Leetcode-training/lt208"
+import (
+	"errors"
+	"github.com/azd1997/Leetcode-training/lt208"
+)
 
 // 最长公共前缀
 
@@ -151,18 +154,150 @@ func LargestCommonPrefix(S []string, q string) string {
 
 // 字典树的实现见lt208
 // 这里给Trie增加方法
-type Trie struct {
-	lt208.Trie
+
+
+
+
+
+
+// 应用字典树求最长公共前缀。那么在公共前缀的部分，必然是没有分叉的
+// 也就是这一段(公共前缀)每一个节点的子节点列表中都必须保证只有一个是非空的
+// 为了更方便的查询每个节点的非空子节点数，设一size.
+// 【其实如果是要方便记录非空节点数的话，用哈希集合代替数组会更方便】
+// 通过数组实现的字典树其实就是26叉树
+type TrieNode struct {
+	next []*TrieNode	// 下一层
+	R int		// r = 26，用来让每个节点初始化next
+	size int	// 非空子节点数
+	isEnd bool	// 标志单词结尾
 }
+func NewTrieNode() *TrieNode {
+	tnode := &TrieNode{}
+	tnode.next = make([]*TrieNode, tnode.R)
+	return tnode
+}
+func (tnode *TrieNode) Size() int {return tnode.size}
+func (tnode *TrieNode) IsEnd() bool {return tnode.isEnd}
+func (tnode *TrieNode) SetEnd() {tnode.isEnd = true}
+func (tnode *TrieNode) Get(ch byte) *TrieNode {
+	if ch<'a' || ch>'z' {return nil}
+	return tnode.next[ch-'a']
+}
+func (tnode *TrieNode) Put(ch byte)	{
+	if ch<'a' || ch>'z' {return}
+	if tnode.next[ch-'a']==nil {
+		tnode.next[ch-'a'] = NewTrieNode()
+		tnode.size++	// 非空子节点+1
+	}
+}
+func (tnode *TrieNode) Has(ch byte) bool {
+	if ch<'a' || ch>'z' {return false}
+	return tnode.next[ch-'a'] != nil
+}
+func (tnode *TrieNode) DelSubNode(ch byte) error {
+	if ch<'a' || ch>'z' {return errors.New("illegal input char")}
+	if !tnode.Has(ch) {return errors.New("nonexistent char")}
+	tnode.next[ch-'a'] = nil
+	return nil
+}
+func (tnode *TrieNode) DisEnd(ch byte) error {
+	if ch<'a' || ch>'z' {return errors.New("illegal input char")}
+	if !tnode.Has(ch) {return errors.New("nonexistent char")}
+	tnode.Get(ch).isEnd = false
+	return nil
+}
+
+// Trie
+type Trie struct {
+	root *TrieNode
+	// size等其他属性这里忽略，不设计
+}
+
+func NewTrie() *Trie {return &Trie{root:NewTrieNode()}}
+func (trie *Trie) Root() *TrieNode {return trie.root}
+
+func (trie *Trie) Insert(word string) {
+	node := trie.root
+	var cur byte
+	for i:=0; i<len(word); i++ {
+		cur = word[i]
+		if !node.Has(cur) {
+			node.Put(cur)	// 没有就放进去
+		}
+		node = node.Get(cur)
+	}
+	node.SetEnd()	// 最后记得给单词结尾
+}
+
+// 把word当做前缀去树里找
+// 不存在，则返回nil
+// 存在且为自己，或者存在且为其他单词前缀，则返回末尾节点
+func (trie *Trie) SearchPrefix(word string) *TrieNode {
+	node := trie.root
+	var cur byte
+	for i:=0; i<len(word); i++ {
+		cur = word[i]
+		if !node.Has(cur) {return nil}
+		node = node.Get(cur)
+		// 这时不需要关心node.IsEnd
+	}
+	return node
+}
+
+// 搜索单词是否存在于前缀树
+func (trie *Trie) Search(word string) bool {
+	node := trie.SearchPrefix(word)
+	return node!=nil && node.IsEnd()
+}
+
+// 搜索word是不是字典树中的某个单词的前缀或本身
+// 与search的区别在于，startwith只在乎是否存在
+func (trie *Trie) StartWith(word string) bool {
+	node := trie.SearchPrefix(word)
+	return node != nil
+}
+
+// 删除某个单词
+func (trie *Trie) Delete(word string) error {
+	node := trie.root
+	var cur byte
+	for i:=0; i<len(word); i++ {
+		cur = word[i]
+		if !node.Has(cur) {
+			return errors.New("no such word")
+		}
+		node = node.Get(cur)
+	}
+	// 现在node是word[len(word)-1]的节点
+	// 但是得先检查是不是isEnd，是才说明有word
+	if !node.isEnd {return errors.New("no such word")}
+
+	// 现在要判断它是叶子节点还是不是
+	if node.size > 0 {	// 不是叶子节点
+		node.isEnd = false		// 只需要置否
+	} else {	// 叶子节点
+		// 需要从叶子节点一直往上删直到有一个节点n
+		// 它具有两个及以上非空子节点
+		// 或者它的isEnd是true
+		//node.isEnd = false	// 先把当前这个节点置为false
+		//for node.size==1 && !node.isEnd {
+		//
+		//}
+		//TODO: 这里删除操作，要么将TrieNode再加一个prev指针指向上层节点(双向链表)
+		// 要么又从头遍历，暂时不知道怎么优雅的实现，先搁置
+	}
+}
+
 
 // 查找word与Trie树当前状态的最长公共前缀
 func (trie *Trie) LongestCommonPrefix(word string) string {
-	node := trie.Root
+	node := trie.Root()
 	prefix := make([]byte, 0, len(word))
 	var cur byte
 	for i:=0; i<len(word); i++ {
 		cur = word[i]
-		if node.ContainsKey(cur) && !node.IsEnd() {
+		// 这三点条件保证了是公共前缀
+		if node.Has(cur) && node.Size() == 1 && !node.IsEnd() {
 			prefix = append(prefix, cur)
 			node = node.Get(cur)
 		} else {
@@ -171,8 +306,3 @@ func (trie *Trie) LongestCommonPrefix(word string) string {
 	}
 	return string(prefix)
 }
-
-
-
-
-
