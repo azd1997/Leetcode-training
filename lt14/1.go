@@ -1,5 +1,7 @@
 package lt14
 
+import "github.com/azd1997/Leetcode-training/lt208"
+
 // 最长公共前缀
 
 //编写一个函数来查找字符串数组中的最长公共前缀。
@@ -131,31 +133,44 @@ func longestCommonPrefix3(strs []string) string {
 // 意味着这样的求最长公共子串函数经常被调用，那么优秀的做法是将S构建成字典树(前缀树)trie甚至是压缩前缀树
 
 func LargestCommonPrefix(S []string, q string) string {
-	return ""
+	if len(S)==0 {return ""}
+	if len(S)==1 {return S[0]}
+
+	// 将S构建字典树
+	trie := &Trie{lt208.Constructor()}
+	for _, s := range S {
+		trie.Insert(s)
+	}
+	// 查询q与S最长公共前缀
+	return trie.LongestCommonPrefix(q)
 }
 
-// 字典树
-type TrieNode struct {
-	Links []*TrieNode	// 子节点的链接数组
-	R int	// R=26，每个节点最多有R个子节点
-	isEnd bool	// 标记树是否遍历到底？
 
-	size int	// 非空子节点的个数
-}
-
-func (tnode *TrieNode) Put(ch byte, node *TrieNode) {
-	tnode.Links[ch-'a'] = node
-	tnode.size++
-}
-
-func (tnode *TrieNode) GetLinks() {
-
-}
 
 
 
 // 字典树的实现见lt208
+// 这里给Trie增加方法
+type Trie struct {
+	lt208.Trie
+}
 
+// 查找word与Trie树当前状态的最长公共前缀
+func (trie *Trie) LongestCommonPrefix(word string) string {
+	node := trie.Root
+	prefix := make([]byte, 0, len(word))
+	var cur byte
+	for i:=0; i<len(word); i++ {
+		cur = word[i]
+		if node.ContainsKey(cur) && !node.IsEnd() {
+			prefix = append(prefix, cur)
+			node = node.Get(cur)
+		} else {
+			return string(prefix)
+		}
+	}
+	return string(prefix)
+}
 
 
 
