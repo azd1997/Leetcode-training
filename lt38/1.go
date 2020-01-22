@@ -1,5 +1,7 @@
 package lt38
 
+import "strconv"
+
 // 外观数列
 
 //是对前一项的描述。前五项如下：
@@ -35,7 +37,34 @@ package lt38
 // 思考：
 // 1. 不借助前置信息的话，可以直接遍历字符串，数有几个连续的字符，然后拼成新的字符；这个过程再进行递归
 
-
+// 1. 暴力
+// 时间复杂度不太好算，反正不是很高效的样子，但是击败了100%
+// 这个题解区 jimmy00745 等的解法一致
 func countAndSay(n int) string {
-	s1 := 1
+	if n==1 {return "1"}
+	s := []byte("1")
+	var tmp []byte
+	var count int	// 同样数字连续出现计数
+	for i:=2; i<=n; i++ {
+		count, tmp = 0, make([]byte, 0)  //记得重置count和tmp
+		for j:=0; j<len(s)-1; j++ {
+			count++
+			if s[j]!=s[j+1] {
+				tmp = append(tmp, []byte(strconv.Itoa(count))...)
+				tmp = append(tmp, s[j])
+				count = 0
+			}
+		}
+		// 还剩最后一个字符
+		tmp = append(tmp, []byte(strconv.Itoa(count+1))...)
+		tmp = append(tmp, s[len(s)-1])
+		// 该把tmp交给s
+		s = tmp
+	}
+
+	return string(s)
 }
+
+// 题解区各种花式解法...动态规划、递归、正则...
+
+// 其实这题用动态规划并没有什么优势的感觉...
