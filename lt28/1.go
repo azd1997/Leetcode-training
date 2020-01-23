@@ -396,3 +396,4 @@ func BM_NextAlreadyExists(a, b string) int {
 
 
 
+// TODO: KMP算法
