@@ -1,4 +1,4 @@
-package heap
+package ltheap
 
 import (
 	"container/heap"
