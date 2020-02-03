@@ -52,6 +52,8 @@ func (this *MedianFinder2) AddNum(num int)  {
 func (this *MedianFinder2) FindMedian() float64 {
 	// 如果大顶堆尺寸 = 小顶堆， 说明n为偶数
 	if this.maxheap.Len() == this.minheap.Len() {
-		return
+		return float64(this.minheap.Seek()) / 2 + float64(this.maxheap.Seek()) / 2
+	} else {	// 否则n为奇数，中位数为大顶堆堆顶
+		return float64(this.maxheap.Seek())
 	}
 }
