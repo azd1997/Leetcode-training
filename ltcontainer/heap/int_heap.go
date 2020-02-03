@@ -27,6 +27,10 @@ func (h *IntHeap) Push(v interface{}) {
 	h.data = append(h.data, v.(int))
 }
 
+func (h *IntHeap) Seek() int {
+	return h.data[1]
+}
+
 // 用法：创建好数组arr之后，定义less函数来决定大顶堆还是小顶堆，传入即可
 func NewIntHeap(data []int, less func(i,j int) bool) *IntHeap {
 	return &IntHeap{
