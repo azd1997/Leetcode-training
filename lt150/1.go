@@ -8,8 +8,8 @@ import "strconv"
 
 
 
-// 使用辅助栈存储中间数字
-func evalRPN(tokens []string) int {
+// 1. 使用辅助栈存储中间数字
+func evalRPN1(tokens []string) int {
 	stack := make([]int, 0)
 	tmp := 0
 	for i:=0; i<len(tokens); i++ {
@@ -29,6 +29,31 @@ func evalRPN(tokens []string) int {
 
 		stack = stack[:len(stack)-2]	// 也可以只删一个，剩下那个替换值
 		stack = append(stack, tmp)
+	}
+	// 对于完整有效的逆波兰表达式，运算结束后栈中只剩一个数字，直接返回即可
+	return stack[0]
+}
+
+
+// 1.1 在 1 基础上优化代码
+func evalRPN11(tokens []string) int {
+	stack := make([]int, 0)
+	l := 0
+	for i:=0; i<len(tokens); i++ {
+		l = len(stack)
+		switch tokens[i] {
+		case "+":
+			stack = append(stack[:l-2], stack[l-2] + stack[l-1])
+		case "-":
+			stack = append(stack[:l-2], stack[l-2] - stack[l-1])
+		case "*":
+			stack = append(stack[:l-2], stack[l-2] * stack[l-1])
+		case "/":
+			stack = append(stack[:l-2], stack[l-2] / stack[l-1])
+		default:	// 数字
+			tmp, _ := strconv.Atoi(tokens[i])
+			stack = append(stack, tmp)
+		}
 	}
 	// 对于完整有效的逆波兰表达式，运算结束后栈中只剩一个数字，直接返回即可
 	return stack[0]
