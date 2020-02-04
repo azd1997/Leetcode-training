@@ -49,7 +49,7 @@ func kthSmallest1(matrix [][]int, k int) int {
 }
 
 
-// 1. 使用最大堆(优先队列)
+// 2. 使用最大堆(优先队列)
 func kthSmallest(matrix [][]int, k int) int {
 
 	// 准备好堆
