@@ -1,6 +1,9 @@
 package lt239
 
-import "math"
+import (
+	ltlist "github.com/azd1997/Leetcode-training/ltcontainer/list"
+	"math"
+)
 
 // 滑动窗口最大值
 
@@ -71,6 +74,9 @@ func maxInArray(arr []int) int {
 // 参考了官方题解后，继续往下做
 // 解法1最多算是对暴力解法O(NK)的优化
 
+
+
+
 // 官方题解给出了另一种动态规划
 // 将数组分成 n/k块或n/k+1，最后一块可能长度不达k
 // 预先处理好动态规划过程中所需要的最大值信息
@@ -105,4 +111,26 @@ func maxSlidingWindow2(nums []int, k int) []int {
 		output[i] = max(left[i+k-1], right[i])
 	}
 	return output
+}
+
+
+
+// 3. 单调队列解法
+// 使用单调队列(保持队列的单调性)来实现窗口内O(1)的最大值求取
+// 单调队列中Push时间复杂度并不是O(1)，但在本题中nums所有元素都最多只会被Push和Pop一次
+// ============解法3============
+func maxSlidingWindow3(nums []int, k int) []int {
+	sdq := ltlist.NewSliceDeque(k)
+	window := ltlist.NewMonotonicQueue(sdq)
+	res := make([]int, 0, k)
+	for i:=0; i<len(nums); i++ {
+		if i<k-1 {	// 先把窗口的前k-1个填满
+			window.Push(nums[i])
+		} else {
+			window.Push(nums[i])
+			res = append(res, window.Max())
+			window.Pop(nums[i-k+1])		// 将窗口最左的元素弹出
+		}
+	}
+	return res
 }
