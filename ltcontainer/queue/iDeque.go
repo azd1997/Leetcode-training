@@ -1,4 +1,4 @@
-package ltlist
+package ltqueue
 
 type IDeque interface {
 	PushFront(v interface{})

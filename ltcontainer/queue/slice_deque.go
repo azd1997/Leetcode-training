@@ -1,4 +1,4 @@
-package ltlist
+package ltqueue
 
 import (
 	"log"
