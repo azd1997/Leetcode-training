@@ -18,5 +18,5 @@ type ILinkedList interface {
 	// 按索引删除
 	DeleteAt(index int)
 
-	Len() int
+	Size() int
 }

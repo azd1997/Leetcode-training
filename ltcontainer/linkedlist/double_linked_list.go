@@ -33,7 +33,7 @@ func (d DoubleLinkedList) DeleteAt(index int) {
 	panic("implement me")
 }
 
-func (d DoubleLinkedList) Len() int {
+func (d DoubleLinkedList) Size() int {
 	panic("implement me")
 }
 
