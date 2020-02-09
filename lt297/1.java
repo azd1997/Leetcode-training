@@ -7,6 +7,14 @@
  *     TreeNode(int x) { val = x; }
  * }
  */
+
+public class TreeNode {
+     int val;
+     TreeNode left;
+     TreeNode right;
+     TreeNode(int x) { val = x; }
+}
+
 public class Codec {
 
     //按层遍历二叉树，用一个队列保存每一层的节点
