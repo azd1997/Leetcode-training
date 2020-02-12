@@ -83,7 +83,7 @@ func numSquares1(n int) int {
 	return dp[n]
 }
 
-// 2. 记忆化递归
+// 2. 记忆化递归  参考 Elon
 // 直接递归会有许多重复子问题
 // 这个解法直接在执行时n=12时就崩了，内存不足
 func numSquares2(n int) int {
@@ -113,7 +113,7 @@ func helper(n int, memory *[]int) int {
 
 // 由记忆化递归就能进一步写出来解法1的动态规划了
 
-// 3. 图论
+// 3. 图论 参考 tqz
 // 将问题考虑成无权图：只要两个数x,y中间相差一个完全平方数，那么x,y这两个节点中间形成一条边
 // 那么问题转化为：在这个无权图中寻找从n到0的最短路径，所以需要BFS完成
 func numSquares3(n int) int {
@@ -204,3 +204,8 @@ func numSquares5(n int) int {
 	// 不是1,2,4，那么就是3
 	return 3
 }
+
+
+// 总结：
+// 递归 -> 记忆化递归(自顶向下) -> 动态规划(自底向上)
+// 图论BFS
