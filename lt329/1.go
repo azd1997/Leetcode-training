@@ -152,7 +152,7 @@ func longestIncreasingPath3(matrix [][]int) int {
 	// 把所有叶子节点加入到队列中
 	leaves := make([][2]int, 0)
 	for i:=1; i<=m; i++ {
-		for j:=1; j<=m; j++ {
+		for j:=1; j<=n; j++ {
 			if outdegree[i][j] == 0 {
 				leaves = append(leaves, [2]int{i,j})	// 把叶子坐标压入
 			}
@@ -181,6 +181,5 @@ func longestIncreasingPath3(matrix [][]int) int {
 	return height
 }
 
-
-// 提交未通过，未通过测例 [[1,2]]
-// TODO
+// TODO: 最后这个解法只是勉强过了测试，
+//  GO版本提交中还有别的效率更高的实现，待学习
