@@ -10,11 +10,11 @@ func TestFib(t *testing.T) {
 		{2, 1},
 		{5, 5},
 		{50, 586268941},
-		{100, 623459107},
+		{100, 687995182},
 	}
 
 	for _, test := range tests {
-		ret := fib2(test.n)
+		ret := fib4(test.n)
 		if ret != test.ans {
 			t.Errorf("n = %d, ans = %d, but return %d\n", test.n, test.ans, ret)
 		}
