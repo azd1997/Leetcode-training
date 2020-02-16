@@ -29,7 +29,9 @@ package lcci0806
 //链接：https://leetcode-cn.com/problems/hanota-lcci
 //著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
 
-//
+// n个盘子移到C <=> 把
+
+
 func hanota(A []int, B []int, C []int)  {
 
 }
