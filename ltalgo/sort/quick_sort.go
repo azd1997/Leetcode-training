@@ -188,7 +188,7 @@ func _partition3(nums *[]int, l, r int) (int, int) {
 		}
 		// 小于base i右移lt右移
 		if (*nums)[i] < (*nums)[l] {
-			(*nums)[i], (*nums)[lt+1] = (*nums)[l+1], (*nums)[i]
+			(*nums)[i], (*nums)[lt+1] = (*nums)[lt+1], (*nums)[i]
 			i++; lt++; continue
 		}
 		// 大于base gt左移, 新交换过来的 i 仍需处理
@@ -211,11 +211,11 @@ func _partition3(nums *[]int, l, r int) (int, int) {
 // 快速排序API
 func QuickSort(no int) func([]int) []int {
 	switch no {
-	case 1:
+	case QuickSortNormal:
 		return quickSort1
-	case 2:
+	case QuickSort2Way:
 		return quickSort2
-	case 3:
+	case QuickSort3Way:
 		return quickSort3
 	default:
 		return nil

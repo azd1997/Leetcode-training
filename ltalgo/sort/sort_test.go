@@ -55,3 +55,15 @@ func TestQuickSort2_SmallDataSet(t *testing.T) {
 func TestQuickSort3_SmallDataSet(t *testing.T) {
 	testSort_SmallDataSet(QuickSort(QuickSort3Way))
 }
+
+func TestHeapSort1_SmallDataSet(t *testing.T) {
+	testSort_SmallDataSet(HeapSort(HeapSort1))
+}
+
+func TestHeapSort2_SmallDataSet(t *testing.T) {
+	testSort_SmallDataSet(HeapSort(HeapSortHeapify))
+}
+
+func TestHeapSort3_SmallDataSet(t *testing.T) {
+	testSort_SmallDataSet(HeapSort(HeapSortInplace))
+}
