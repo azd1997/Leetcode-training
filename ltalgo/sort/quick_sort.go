@@ -93,7 +93,7 @@ func quickSort2(arr []int) []int {
 
 func _quickSort2(arr *[]int, start, end int) {
 	// 退出递归条件
-	if start>end {return}
+	if start>=end {return}
 
 	// 优化：数列长度较小时，使用插入排序
 	if end-start<=15 {
@@ -149,10 +149,11 @@ func quickSort3(arr []int) []int {
 
 func _quick3(nums *[]int, l, r int) {
 	// 递归终止(没法再partition)
-	if l >= r {return}
+	if l >= r {return}	// 区间为1时没必要再排序
 	// 区间较小时使用插入排序
 	if r - l <= 15 {
 		_insertSort(nums, l, r)
+		return
 	}
 
 	//////////////////////////////////

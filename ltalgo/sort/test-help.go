@@ -85,7 +85,7 @@ func testSort(arr []int, sort func([]int) []int, isASC bool) {
 }
 
 func testSort_SmallDataSet(sort func([]int) []int) {
-	arr1 := generateRandomArray(10, 0, 9)
+	arr1 := generateRandomArray(20, 0, 20)
 	fmt.Println(arr1)
 	sort(arr1)
 	fmt.Println(arr1)
