@@ -1,6 +1,7 @@
 package ltsort
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"reflect"
@@ -83,7 +84,15 @@ func testSort(arr []int, sort func([]int) []int, isASC bool) {
 	log.Printf("%s sort success, used %d ns", sortName, d)
 }
 
-
+func testSort_SmallDataSet(sort func([]int) []int) {
+	arr1 := generateRandomArray(10, 0, 9)
+	fmt.Println(arr1)
+	sort(arr1)
+	fmt.Println(arr1)
+	if !isSorted(arr1, true) {
+		log.Fatalln("error")
+	}
+}
 
 
 

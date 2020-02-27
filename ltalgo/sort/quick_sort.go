@@ -18,6 +18,14 @@ import "math/rand"
 // 3.递归地（recursively）把小于基准值元素的子数列
 // 和大于基准值元素的子数列排序。
 
+
+
+
+
+
+// 普通快排 + 随机化基数优化 + 插入排序优化
+
+
 func quickSort1(arr []int) []int {
 	_quickSort(&arr, 0, len(arr)-1)
 	return arr
@@ -42,7 +50,6 @@ func _quickSort(arr *[]int, start, end int) {
 func _partition(arr *[]int, start, end int) int {
 	// 随机产生一个基准下标
 	pos := rand.Intn(end-start) + start
-
 	// 交换第一个和基准的位置
 	(*arr)[pos], (*arr)[start] = (*arr)[start], (*arr)[pos]
 
@@ -63,6 +70,9 @@ func _partition(arr *[]int, start, end int) int {
 
 
 
+
+
+
 // 快速排序一些可以优化的点:
 // 1. 当数列近乎有序的时， 由于每次选取的都是第一个数，
 // 所以造成数列分割的极其不等， 此时快排蜕化成  的算法，
@@ -72,10 +82,147 @@ func _partition(arr *[]int, start, end int) int {
 // 3. 使用三路快排
 //
 
+/////////////////////////////////////////////////////////
+
+// 双路快排
+
+func quickSort2(arr []int) []int {
+	_quickSort2(&arr, 0, len(arr)-1)
+	return arr
+}
+
+func _quickSort2(arr *[]int, start, end int) {
+	// 退出递归条件
+	if start>end {return}
+
+	// 优化：数列长度较小时，使用插入排序
+	if end-start<=15 {
+		_insertSort(arr, start, end); return
+	}
+
+	// 对区域进行分区，找到一个分割点p
+	p := _partition2(arr, start, end)
+
+	_quickSort2(arr, start, p-1)
+	_quickSort2(arr, p+1, end)
+}
+
+// 双路快排分区
+func _partition2(nums *[]int, l, r int) int {
+	// 随机一个元素(也就是)作为基数base
+	randIdx := rand.Intn(r-l+1) + l
+	(*nums)[randIdx], (*nums)[l] = (*nums)[l], (*nums)[randIdx]
+	// 现在base = nums[l]
+
+	////////////////////////////////////////////
+	// 以下为修改过的代码
+
+	// 满足 nums[l+1:i+1] <= nums[l] <= nums[j:r+1]
+	i, j := l+1, r
+	for {
+		// i右移
+		for i<=r && (*nums)[i]<(*nums)[l] {i++}
+		// j左移
+		for j>l && (*nums)[j]>(*nums)[l] {j--}
+		// 是否已经遍历结束
+		if i>j {break}
+		// 交换i,j并继续移动
+		(*nums)[i], (*nums)[j] = (*nums)[j], (*nums)[i]
+		i, j = i+1, j-1
+	}
+	// 遍历结束后， i为从左向右看第一个 >=nums[l] 的元素
+	// j 为i为从右向左看第一个 <=nums[l] 的元素
+	// 因此 nums[l] 应该和 nums[j] 交换
+	// 才能继续保证 base 左侧都 <=base， 右侧都 >= base
+	(*nums)[l], (*nums)[j] = (*nums)[j], (*nums)[l]
+
+	return j
+}
+
+/////////////////////////////////
+
+func quickSort3(arr []int) []int {
+	_quick3(&arr, 0, len(arr)-1)
+	return arr
+}
 
 
+func _quick3(nums *[]int, l, r int) {
+	// 递归终止(没法再partition)
+	if l >= r {return}
+	// 区间较小时使用插入排序
+	if r - l <= 15 {
+		_insertSort(nums, l, r)
+	}
+
+	//////////////////////////////////
+
+	// partition得到分界点
+	p1, p2 := _partition3(nums, l, r)
+	// 继续对左右进行递归处理
+	_quick3(nums, l, p1-1)
+	_quick3(nums, p2+1, r)
+
+	//////////////////////////////////
+}
+
+// 三路快排分区
+func _partition3(nums *[]int, l, r int) (int, int) {
+	// 随机一个元素(也就是)作为基数base
+	randIdx := rand.Intn(r-l+1) + l
+	(*nums)[randIdx], (*nums)[l] = (*nums)[l], (*nums)[randIdx]
+	// 现在base = nums[l]
+
+	////////////////////////////////////////////
+	// 以下为修改过的代码
+
+	// 满足 nums[l+1:lt+1] < nums[lt+1:i-1] <= nums[gt:r+1]
+	// 保证初始时 Left/Right/Mid 均为空
+	lt, gt, i := l, r+1, l+1
+
+	for i < gt {    // 如果i与gt相遇，遍历结束. 而且这个限制保证了 i 不会越界
+		// 等于base时 i 右移
+		if (*nums)[i] == (*nums)[l] {
+			i++; continue
+		}
+		// 小于base i右移lt右移
+		if (*nums)[i] < (*nums)[l] {
+			(*nums)[i], (*nums)[lt+1] = (*nums)[l+1], (*nums)[i]
+			i++; lt++; continue
+		}
+		// 大于base gt左移, 新交换过来的 i 仍需处理
+		if (*nums)[i] > (*nums)[l] {
+			(*nums)[i], (*nums)[gt-1] = (*nums)[gt-1], (*nums)[i]
+			gt--; continue
+		}
+	}
+	// 交换 l 与 lt
+	(*nums)[l], (*nums)[lt] = (*nums)[lt], (*nums)[l]
+	// 返回p1,p2. p1=lt, p2=gt-1
+	return lt, gt-1
+}
+
+
+
+
+////////////////////////////////////
 
 // 快速排序API
-func QuickSort(arr []int) []int {
-	return quickSort1(arr)
+func QuickSort(no int) func([]int) []int {
+	switch no {
+	case 1:
+		return quickSort1
+	case 2:
+		return quickSort2
+	case 3:
+		return quickSort3
+	default:
+		return nil
+	}
 }
+
+const (
+	QuickSortNormal = 1
+	QuickSort2Way = 2
+	QuickSort3Way = 3
+)

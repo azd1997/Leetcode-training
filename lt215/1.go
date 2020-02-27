@@ -3,6 +3,7 @@ package lt215
 import (
 	"container/heap"
 	LTheap "github.com/azd1997/Leetcode-training/ltcontainer/heap"
+	"math/rand"
 	"sort"
 )
 
@@ -71,3 +72,55 @@ func max(a,b int) int {if a>b {return a} else {return b}}
 func min(a,b int) int {if a<b {return a} else {return b}}
 
 
+// TODO: !!! 领会快排
+// 4. 最优解 快速排序
+
+// 常规解法：
+// 1. 排序后倒序遍历k   O(nlogn)/O(1) 快排  O(nlogn)/O(n) 归并 O(nlogk)/O(k) 堆排序
+// 2. 二分查找: 先求数组最大值max和最小值min，取数值mid，看数组中比mid大的数有多少，若大于k则说明mid过小，将值区间缩小为[mid,max]继续二分 O(nlogn)/O(1)
+// 3. 最优解：利用快速排序，快速排序的核心是每一次partition都将选取的基数放置到了最终位置上。利用这个选出的基数最终放置的位置与k的关系，可以缩减排序区间，实现 O(n)/O(1)的解法
+// 解题时直接使用普通随机化快排，就不使用三路快排了。快排详细参考https://eiger.me博客
+
+// 普通快排 + 缩减排序空间
+func findKthLargest4(nums []int, k int) int {
+	n := len(nums)
+	if n < k {return -1}
+
+	return _quick(&nums, n, k, 0, n-1)
+}
+
+func _quick(nums *[]int, n, k, l, r int) int {
+	if l == r {return (*nums)[l]}   // 区间只剩一个元素，只可能是这个了
+
+	p := _partition(nums, k, l, r)
+
+	// 必然会遇到第k大元素，遇到了就没必要继续递归下去了
+	if p == (n-k) {return (*nums)[p]}
+
+	// 否则向靠近n-k侧递归
+	if p < n-k {
+		return _quick(nums, n, k, p+1, r)
+	} else {    // > n-k
+		return _quick(nums, n, k, l, p-1)
+	}
+}
+
+
+func _partition(nums *[]int, k, l, r int) int {
+	// 随机选取基数
+	randIdx := rand.Intn(r-l+1) + l
+	// 交换到最左边
+	(*nums)[l], (*nums)[randIdx] = (*nums)[randIdx], (*nums)[l]
+
+	p := l    // p记录Less与Right交界，p为Less右端点，包含在内
+	// 向右遍历
+	for i:=l+1; i<=r; i++ {
+		if (*nums)[i] < (*nums)[l] {
+			(*nums)[i], (*nums)[p+1] = (*nums)[p+1], (*nums)[i]
+			p++ // p后移
+		}
+	}
+	// 交换基数与Less末位，交换后p为基数所在
+	(*nums)[l], (*nums)[p] = (*nums)[p], (*nums)[l]
+	return p
+}

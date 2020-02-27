@@ -23,8 +23,9 @@ func mergeSort1(arr []int) []int {
 }
 
 func _mergeSort(arr *[]int, start, end int) {
-	// 退出条件
-	if start > end {return}
+	// 退出条件(区间长度<2) 其实这里写 start == end 也完全ok
+	// if start >= end {return}
+	if start == end {return}
 
 	// 如果区间长度<15，数列基本有序的概率较大，插入排序比较适合
 	if end-start<=15 {
@@ -50,7 +51,7 @@ func _insertSort(arr *[]int, start, end int) {
 				(*arr)[j] = (*arr)[j-1]
 			} else {break}
 		}
-		(*arr)[j-1] = curNum
+		(*arr)[j] = curNum
 	}
 }
 
@@ -74,8 +75,10 @@ func _merge(arr *[]int, start, mid, end int) {
 			(*arr)[pos] = copyArr[l-start]
 			l++
 		} else if copyArr[l-start] <= copyArr[k-start] {
-			l++
+			(*arr)[pos] = copyArr[l-start]
+				l++
 		} else {
+			(*arr)[pos] = copyArr[k-start]
 			k++
 		}
 		// pos后移

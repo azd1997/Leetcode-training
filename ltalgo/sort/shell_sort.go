@@ -39,12 +39,12 @@ func gapInsertSort(arr *[]int, start, gap int) {
 	for i:=start+gap; i<n; i+=gap {
 		j = i
 		curNum = (*arr)[i]
-		for ; j>=0; j-- {
+		for ; j>=start+gap; j-- {
 			if curNum < (*arr)[j-1] {
 				(*arr)[j] = (*arr)[j-1]
 			} else {break}
 		}
-		(*arr)[j-1] = curNum
+		(*arr)[j] = curNum
 	}
 }
 

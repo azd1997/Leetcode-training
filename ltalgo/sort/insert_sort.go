@@ -28,7 +28,7 @@ func insertSort1(arr []int) []int {
 				break
 			}
 		}
-		arr[j-1] = curNum	// 把curNum放到前面找到的合适位置上
+		arr[j] = curNum	// 把curNum放到前面找到的合适位置上
 	}
 	return arr
 }
