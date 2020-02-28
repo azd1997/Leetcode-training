@@ -32,16 +32,28 @@ package lcci0806
 // n个盘子移到C <=> 把
 
 
-func hanota(A []int, B []int, C []int)  {
+func hanota(A *[]int, B *[]int, C *[]int)  {
+	n := len(*A)
+	if n == 0 {return}
 
+	// 将n个盘子，从A 经过B(以B作为辅助) 放到C
+	move(n, A, B, C)
 }
 
-// 将n个盘子从A经过B移去C
-func move(n int, A,B,C []int) {
+// 将n个盘子从A经过B移去C。
+func move(n int, A,B,C *[]int) {
 	if n == 1 {
-		C = append(C, A[len(A)-1])
-		A = A[:len(A)-1]
+		// 直接将盘子从A移到C
+		*C = append(*C, (*A)[len(*A)-1])	// 将A末尾追加到C末尾
+		*A = (*A)[:len(*A)-1]	// A缩小
+		return
 	}
 
-
+	// 否则的话，需要先将A中最大盘子上面的盘子(n-1个盘子) 经过 C 移动到 B
+	move(n-1, A, C, B)
+	// 然后再将A剩下的唯一盘子移到C
+	*C = append(*C, (*A)[len(*A)-1])	// 将A末尾追加到C末尾
+	*A = (*A)[:len(*A)-1]	// A缩小
+	// 再将B上的这些盘子 经过A 挪到C
+	move(n-1, B, A, C)
 }
