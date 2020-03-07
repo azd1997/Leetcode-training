@@ -79,7 +79,9 @@ func maxSlidingWindow3(nums []int, k int) []int {
 	// res[0]
 	res[0] = maxheap[0]		// 最大值都会“浮”到0这个位置
 
-	heap.Remove()
+	//heap.Remove(&maxheap, 0)	// 先把原先队列最左边元素删除，再入新元素。但是这里实现不了
+	// 需要使用索引最大堆而不是最大堆。
+
 	for i:=1; i<m; i++ {
 		if nums[i+k-1] >= res[i-1] {
 			res[i] = nums[i+k-1]
@@ -122,7 +124,7 @@ func (h *MaxHeap) Pop() (v interface{}) {
 
 
 // 2. 单调栈或者单调队列，本质一样，这里使用单调栈的概念，使用切片实现
-//
+// TODO： 这里似乎没有实现，可以查看lcof59-II的单调队列
 func maxSlidingWindow4(nums []int, k int) []int {
 	n := len(nums)
 	if n < k {return nil}
