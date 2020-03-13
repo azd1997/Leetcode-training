@@ -90,3 +90,5 @@ func PreOrderIterate2(root *TreeNode) []int {
 
 	return arr
 }
+
+// 前序遍历迭代版本在结点入栈时处理
