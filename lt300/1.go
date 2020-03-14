@@ -4,7 +4,6 @@ import "math"
 
 // 最长上升子序列
 
-
 // 思考：
 // 1. 由于存在多条上升序列，先不考虑最长上升序列，
 // 先考虑如何从第i个元素开始直至末尾，寻找到以第i元素为起点的上升序列长度
@@ -13,24 +12,26 @@ import "math"
 // 每次遇新值都更新所有已经记录的上升序列起点，如果不能加入到任何已存在的上升序列，
 // 则又新增一条上升序列。 O(n2)/O(n) 本质和解法1相同，但是时间上优化了一些
 
-
-
 // 1. 暴力双层遍历 O(n2)/O(1)
 func lengthOfLIS(nums []int) int {
 	n := len(nums)
-	if n<2 {return n}
+	if n < 2 {
+		return n
+	}
 
 	// i为上升序列起点
-	longest := 0	// 最长上升序列长度
-	for i:=0; i<n-1; i++ {	// 最后一个没必要遍历，因为只可能是长度为1的上升序列
-		tail, length := nums[i], 1	// 以nums[i]为起点的上升序列的尾部和长度
-		for j:=i+1; j<n; j++ {
+	longest := 0               // 最长上升序列长度
+	for i := 0; i < n-1; i++ { // 最后一个没必要遍历，因为只可能是长度为1的上升序列
+		tail, length := nums[i], 1 // 以nums[i]为起点的上升序列的尾部和长度
+		for j := i + 1; j < n; j++ {
 			if nums[j] > tail {
 				tail = nums[j]
 				length++
 			}
 		}
-		if length > longest {longest = length}
+		if length > longest {
+			longest = length
+		}
 	}
 
 	return longest
@@ -43,30 +44,35 @@ func lengthOfLIS(nums []int) int {
 // 以j结束(不一定包含元素j)过程中上升序列
 func lengthOfLIS2(nums []int) int {
 	n := len(nums)
-	if n<2 {return n}
+	if n < 2 {
+		return n
+	}
 
 	dp := make([][]int, n)
-	for i:=0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		dp[i] = make([]int, n)
 	}
 
 	// i为上升序列起点
-	longest := 0	// 最长上升序列长度
-	for i:=0; i<n-1; i++ {	// 最后一个没必要遍历，因为只可能是长度为1的上升序列
-		tail, length := nums[i], 1	// 以nums[i]为起点的上升序列的尾部和长度
+	longest := 0               // 最长上升序列长度
+	for i := 0; i < n-1; i++ { // 最后一个没必要遍历，因为只可能是长度为1的上升序列
+		tail, length := nums[i], 1 // 以nums[i]为起点的上升序列的尾部和长度
 
-
-		for j:=i+1; j<n; j++ {
+		for j := i + 1; j < n; j++ {
 			if nums[j] > tail {
 				tail = nums[j]
 				length++
 			}
 		}
-		if length > longest {longest = length}
+		if length > longest {
+			longest = length
+		}
 	}
 
 	return longest
 }
+
+// NOTICE： 前面动态规划并没有实现
 
 // 以下参考官方题解/
 
@@ -78,7 +84,9 @@ func lengthOfLIS3(nums []int) int {
 // 返回值为nums[0:curpos+1]范围的最长上升序列长度
 func helper(nums []int, prev, curpos int) int {
 	// 当前位置到了nums末尾之后，自然返回0
-	if curpos == len(nums) {return 0}
+	if curpos == len(nums) {
+		return 0
+	}
 
 	// 对于curpos有两种选择，
 	// (1)比prev大可选择加入到上升序列，prev变为nums[curpos]
@@ -88,7 +96,7 @@ func helper(nums []int, prev, curpos int) int {
 	// 总时间复杂度O(2^n)
 	// 总空间复杂度为递归栈的占用大小 O(2^n)
 
-	taken := 0	// 携带curpos的情况（将curpos加到上升序列末尾）
+	taken := 0 // 携带curpos的情况（将curpos加到上升序列末尾）
 	if nums[curpos] > prev {
 		taken = 1 + helper(nums, nums[curpos], curpos+1)
 	}
@@ -98,7 +106,13 @@ func helper(nums []int, prev, curpos int) int {
 	return max(taken, nottaken)
 }
 
-func max(a,b int) int {if a>=b {return a} else {return b}}
+func max(a, b int) int {
+	if a >= b {
+		return a
+	} else {
+		return b
+	}
+}
 
 // 2. 记忆化递归
 // 记忆化的化则是要记忆两个参数prev,curpos对应的值
@@ -107,12 +121,16 @@ func max(a,b int) int {if a>=b {return a} else {return b}}
 // O(n2)/O(n2)
 func lengthOfLIS4(nums []int) int {
 	n := len(nums)
-	if n<2 {return n}
+	if n < 2 {
+		return n
+	}
 
 	memo := make([][]int, n+1)
-	for i:=0; i<=n; i++ {
+	for i := 0; i <= n; i++ {
 		memo[i] = make([]int, n)
-		for j:=0; j<n; j++ {memo[i][j] = -1}
+		for j := 0; j < n; j++ {
+			memo[i][j] = -1
+		}
 	}
 
 	return helper2(nums, -1, 0, &memo)
@@ -122,10 +140,12 @@ func lengthOfLIS4(nums []int) int {
 func helper2(nums []int, previdx, curpos int, memo *[][]int) int {
 
 	// 当前位置到了nums末尾之后，自然返回0
-	if curpos == len(nums) {return 0}
+	if curpos == len(nums) {
+		return 0
+	}
 
 	// 如果曾经遇到过  // previdx+1是因为最前面多了个idx=-1这一项
-	if (*memo)[previdx + 1][curpos] >= 0 {	// >=0说明赋过值了
+	if (*memo)[previdx+1][curpos] >= 0 { // >=0说明赋过值了
 		return (*memo)[previdx+1][curpos]
 	}
 
@@ -133,7 +153,7 @@ func helper2(nums []int, previdx, curpos int, memo *[][]int) int {
 	// (1)比prev大可选择加入到上升序列，prev变为nums[curpos]
 	// (2)不加入，prev不变
 
-	taken := 0	// 携带curpos的情况（将curpos加到上升序列末尾）
+	taken := 0 // 携带curpos的情况（将curpos加到上升序列末尾）
 	if previdx < 0 || nums[curpos] > nums[previdx] {
 		taken = 1 + helper2(nums, curpos, curpos+1, memo)
 	}
@@ -144,18 +164,19 @@ func helper2(nums []int, previdx, curpos int, memo *[][]int) int {
 	return (*memo)[previdx+1][curpos]
 }
 
-
 // 3. 动态规划 O(n2)/O(n)
 func lengthOfLIS5(nums []int) int {
 	n := len(nums)
-	if n<2 {return n}
+	if n < 2 {
+		return n
+	}
 
-	dp := make([]int, n)	// dp[i]记录的是nums[0:i+1]内的最大上升序列长度
+	dp := make([]int, n) // dp[i]记录的是nums[0:i+1]内的最大上升序列长度
 	dp[0] = 1
 	maxans := 1
-	for i:=1; i<n; i++ {
-		maxval := 0	//maxval代表了dp[i]在内层遍历是变化的临时值
-		for j:=0; j<i; j++ {
+	for i := 1; i < n; i++ {
+		maxval := 0 //maxval代表了dp[i]在内层遍历是变化的临时值
+		for j := 0; j < i; j++ {
 			if nums[i] > nums[j] {
 				maxval = max(maxval, dp[j])
 			}
@@ -175,20 +196,26 @@ func lengthOfLIS5(nums []int) int {
 //总之，思想就是让 dp 中存储比较小的元素。这样，dp 未必是真实的最长上升子序列，但长度是对的。
 func lengthOfLIS6(nums []int) int {
 	n := len(nums)
-	if n<2 {return n}
+	if n < 2 {
+		return n
+	}
 
-	dp := make([]int, n)	// dp[i]记录的是nums[0:i+1]内的最大上升序列长度
+	dp := make([]int, n) // dp[i]记录的是nums[0:i+1]内的最大上升序列长度
 	res := 0
 	for _, num := range nums {
 		i, j := 0, res
-		for i<j {
-			mid := (i+j)/2
+		for i < j {
+			mid := (i + j) / 2
 			if dp[mid] < num {
 				i = mid + 1
-			} else {j = mid}
+			} else {
+				j = mid
+			}
 		}
 		dp[i] = num
-		if res == j {res++}
+		if res == j {
+			res++
+		}
 	}
 	return res
 }
