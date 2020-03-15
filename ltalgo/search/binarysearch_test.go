@@ -31,3 +31,21 @@ func TestBinarySearchTp1(t *testing.T) {
 		}
 	}
 }
+
+func TestBinarySearchTp2(t *testing.T) {
+	for _, test := range tests {
+		ret := BinarySearchTp2(test.nums, test.target)
+		if ret != test.idx {
+			t.Errorf("nums=%v, target=%d, should get %d, but return %d\n", test.nums, test.target, test.idx, ret)
+		}
+	}
+}
+
+func TestBinarySearchTp3(t *testing.T) {
+	for _, test := range tests {
+		ret := BinarySearchTp3(test.nums, test.target)
+		if ret != test.idx {
+			t.Errorf("nums=%v, target=%d, should get %d, but return %d\n", test.nums, test.target, test.idx, ret)
+		}
+	}
+}
