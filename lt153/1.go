@@ -17,13 +17,17 @@ package lt153
 func findMin(nums []int) int {
 
 	// 特殊情况
-	if len(nums)==0 {return 0}
+	if len(nums) == 0 {
+		return 0
+	}
 
 	// 一般情况
-	for i:=0; i<len(nums)-1; i++ {
-		if nums[i]>nums[i+1] {return nums[i+1]}
+	for i := 0; i < len(nums)-1; i++ {
+		if nums[i] > nums[i+1] {
+			return nums[i+1]
+		}
 	}
-	return nums[0]	// 找不到转折点，说明没有进行旋转，或者说旋转点在nums[0]
+	return nums[0] // 找不到转折点，说明没有进行旋转，或者说旋转点在nums[0]
 }
 
 // 2. 二分查找
@@ -34,13 +38,19 @@ func findMin2(nums []int) int {
 
 	// 特殊情况
 	length := len(nums)
-	if length==0 {return -1}
-	if length==1 {return nums[0]}
+	if length == 0 {
+		return -1
+	}
+	if length == 1 {
+		return nums[0]
+	}
 
 	// nums没有重复元素
 	// 判断数组是否被旋转: nums[0] > nums[l-1]	小于说明没旋转， 大于说明旋转过
 	// 例如 [1,2,3,4,5] => [4,5,1,2,3]
-	if nums[0] < nums[length-1] {return nums[0]}
+	if nums[0] < nums[length-1] {
+		return nums[0]
+	}
 
 	// 注意旋转规律，以前面的例子为例， 称3与4中间为旋转点，之后的部分被旋转至数组前面。
 	// 旋转后称5和1中间为影响点k，以k为界， 左边元素都比nums[0]大，右边元素都比nums[0]小
@@ -53,13 +63,17 @@ func findMin2(nums []int) int {
 	// mid > mid+1 => mid+1是最小值
 	// mid-1 > mid => mid是最小值
 
-	l, r, mid := 0, len(nums)-1, 0	// 都是下标
-	for r>=l {
-		mid = l + (r-l)/2	// 这样写不容易整型溢出
+	l, r, mid := 0, len(nums)-1, 0 // 都是下标
+	for r >= l {
+		mid = l + (r-l)/2 // 这样写不容易整型溢出
 
 		// 停止条件
-		if nums[mid] > nums[mid+1] {return nums[mid+1]}
-		if nums[mid-1] > nums[mid] {return nums[mid]}
+		if nums[mid] > nums[mid+1] {
+			return nums[mid+1]
+		}
+		if nums[mid-1] > nums[mid] {
+			return nums[mid]
+		}
 
 		// 更新边界
 		if nums[mid] > nums[0] {
@@ -81,12 +95,18 @@ func findMin3(nums []int) int {
 
 	// 特殊情况
 	length := len(nums)
-	if length==0 {return -1}
-	if length==1 {return nums[0]}
-	if nums[0] < nums[length-1] {return nums[0]}
+	if length == 0 {
+		return -1
+	}
+	if length == 1 {
+		return nums[0]
+	}
+	if nums[0] < nums[length-1] {
+		return nums[0]
+	}
 
-	l, r, mid := 0, len(nums)-1, 0	// 都是下标
-	for l<r { // 当 l,r相邻时， mid=l
+	l, r, mid := 0, len(nums)-1, 0 // 都是下标
+	for l < r {                    // 当 l,r相邻时， mid=l
 
 		// 不管边界如何变化，只要包含影响点，则 nums[r] < nums[l]
 		if nums[l] < nums[r] {
@@ -116,9 +136,9 @@ func findMin4(nums []int) int {
 }
 
 func searchMin(nums []int, l, r int) int {
-	if nums[l] <= nums[r] {	// 有序状态直接返回有序区间中最小值(最左)
+	if nums[l] <= nums[r] { // 有序状态直接返回有序区间中最小值(最左)
 		return nums[l]
-	} else {	// 对无序区间做处理
+	} else { // 对无序区间做处理
 		mid := l + (r-l)/2
 		return min(searchMin(nums, l, mid), searchMin(nums, mid+1, r))
 	}
@@ -126,11 +146,50 @@ func searchMin(nums []int, l, r int) int {
 }
 
 func min(a, b int) int {
-	if a>=b {return b}
+	if a >= b {
+		return b
+	}
 	return a
 }
-
 
 // 递归分治 优化
 // 在上面的解法中当发现有序的区间之后，这有序的区间中是没必要继续递归下去的
 // 而优化的解法其实就是前面二分查找的过程
+
+// 另一种二分查找，基于labuladong的二分查找框架
+// 核心在于利用左右子区间的有序与否，不断逼近旋转点，旋转点也就是最小点
+
+// 对于labuladong二分模板找target本身。
+// 比较nums[l]和nums[mid]，若左区间有序，则去右；否则去左。最后只剩一个元素，就是旋转点，也就是最小值
+func findMin5(nums []int) int {
+	// 特殊情况
+	n := len(nums)
+	if n == 0 {
+		return -1
+	} // 不存在，异常
+	if n == 1 {
+		return nums[0]
+	}
+
+	// 二分 模板2
+	l, r, mid := 0, n-1, 0 // 这里同样 r 得是 n-1 ， 避免索引越界
+	for l <= r {
+		// 注意，先得检查区间是否有序
+		if nums[l] <= nums[r] { // 当区间长度为1时取=号
+			return nums[l]
+		}
+
+		mid = (r-l)/2 + l
+		if l == r { // 最后逼近到长度为1，必然是旋转点
+			return nums[l]
+		}
+		if nums[l] <= nums[mid] { // 左区间有序
+			l = mid + 1 // mid必然不是旋转点   [mid+1:r]
+		} else { // 左区间无序，含有旋转点
+			r = mid // [l:mid]
+		}
+	}
+
+	// 不可能走到这里
+	return -1
+}

@@ -9,17 +9,21 @@ import "sort"
 // 2. 如果重复数只重复一次，可以通过不断累加数组元素，且减去i(i=1~n)，最终剩余的就是重复数
 // 3. 既然题目要求O(1)空间，时间<O(n2)，那么还有一种就是排序(快排，原地排序)然后遍历一次，实现O(nlogn)/O(1)
 // 4. 有没有可能线性时间复杂度内找出重复值呢？
-
+// 5. 并且不修改原数组
 
 // 1. 排序后遍历
 func findDuplicate(nums []int) int {
 	n := len(nums)
-	if n<2 {return 0}	// 不存在重复数
+	if n < 2 {
+		return 0
+	} // 不存在重复数
 
 	sort.Ints(nums)
 
-	for i:=1; i<n; i++ {
-		if nums[i]==nums[i-1] {return nums[i]}
+	for i := 1; i < n; i++ {
+		if nums[i] == nums[i-1] {
+			return nums[i]
+		}
 	}
 
 	return 0
@@ -28,10 +32,12 @@ func findDuplicate(nums []int) int {
 // 2. 哈希表 O(n)/O(n)
 func findDuplicate2(nums []int) int {
 	n := len(nums)
-	if n<2 {return 0}	// 不存在重复数
+	if n < 2 {
+		return 0
+	} // 不存在重复数
 
 	set := make(map[int]bool)
-	for i:=0; i<n; i++ {
+	for i := 0; i < n; i++ {
 		if !set[nums[i]] {
 			set[nums[i]] = true
 		} else {
@@ -58,8 +64,9 @@ func findDuplicate2(nums []int) int {
 //
 func findDuplicate3(nums []int) int {
 	n := len(nums)
-	if n<2 {return 0}	// 不存在重复数
-
+	if n < 2 {
+		return 0
+	} // 不存在重复数
 
 	// 阶段1： 寻找两个跑者(乌龟和兔子)的汇合点
 	tortoise, hare := nums[0], nums[0]
@@ -83,7 +90,6 @@ func findDuplicate3(nums []int) int {
 	return before
 }
 
-
 // 4. 二分查找 + 抽屉原理 O(nlogn)/O(1)
 // 这道题就是抽屉原理(十个苹果放九个抽屉，必然至少有一个抽屉的苹果数>=2)的应用
 // 在这道题中数值范围是1~n，那么
@@ -93,9 +99,11 @@ func findDuplicate3(nums []int) int {
 // 利用这个特性不断提一个数，然后哦不断二分自然数空间，直至最后找到重复
 func findDuplicate4(nums []int) int {
 	n := len(nums)
-	if n<2 {return 0}	// 不存在重复数
+	if n < 2 {
+		return 0
+	} // 不存在重复数
 
-	left, right := 1, n-1	// 数值范围的上下限
+	left, right := 1, n-1 // 数值范围的上下限
 
 	for left < right {
 		mid := (left + right) >> 1
@@ -103,7 +111,9 @@ func findDuplicate4(nums []int) int {
 		// 统计 <= mid 的数量
 		count := 0
 		for _, num := range nums {
-			if num <= mid {count++}
+			if num <= mid {
+				count++
+			}
 		}
 
 		// 判断count与mid关系，更新边界
@@ -117,17 +127,20 @@ func findDuplicate4(nums []int) int {
 	return left
 }
 
-
 // 5. 使用类似「力扣」第 41 题：“缺失的第一个正数” 的思路，
 // 当两个数发现要放在同一个地方的时候，就发现了这个重复的元素，
 // 这违反了题目不得修改原数组的限制；
 func findDuplicate5(nums []int) int {
 	n := len(nums)
-	if n<2 {return 0}	// 不存在重复数
+	if n < 2 {
+		return 0
+	} // 不存在重复数
 
 	// 由于数值范围1~n，所以可以用0作为标记
 	for _, num := range nums {
-		if nums[num] != 0 {return num}	// num重复了
+		if nums[num] != 0 {
+			return num
+		} // num重复了
 		nums[num] = 0
 	}
 
