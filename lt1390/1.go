@@ -2,7 +2,7 @@ package lt1390
 
 // 四因数
 
-// 这是当时做的比较暴力的做法
+// 这是当时做的比较暴力的做法 时间复杂度 O(N*sqrt(num)) num范围不超过1e5
 
 func sumFourDivisors(nums []int) int {
 	res := 0
@@ -33,3 +33,5 @@ func hasFourFactor(num int) int {
 }
 
 // TODO： 高效解法
+// https://leetcode-cn.com/problems/four-divisors/solution/si-yin-shu-by-leetcode-solution/
+// 预处理：各种筛法
