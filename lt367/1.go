@@ -54,5 +54,5 @@ func isPerfectSquare3(num int) bool {
 	for x*x > num {
 		x = (x + num/x) / 2
 	}
-	return x*x == nums
+	return x*x == num
 }
