@@ -156,3 +156,9 @@ func _merge2(arr *[]int, start, mid, end int) {
 func MergeSort(arr []int) []int {
 	return mergeSort1(arr)
 }
+
+
+///////////////////////////////////////////////////////////////////////
+
+// 练习区域
+

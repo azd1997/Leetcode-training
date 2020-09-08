@@ -19,10 +19,6 @@ import "math/rand"
 // 和大于基准值元素的子数列排序。
 
 
-
-
-
-
 // 普通快排 + 随机化基数优化 + 插入排序优化
 
 
@@ -227,3 +223,43 @@ const (
 	QuickSort2Way = 2
 	QuickSort3Way = 3
 )
+
+
+//////////////////////////////////////////////////
+// 练习区域
+func quickSort11(arr []int) []int {
+	_quickSort11(arr, 0, len(arr) - 1)
+	return arr
+}
+
+func _quickSort11(arr []int, l, r int) {
+
+	if l >= r {		// 没必要再排序
+		return
+	}
+
+	if r - l < 15 {
+		// 使用插入排序
+	}
+
+	// partition
+	p := _partition11(arr, l, r)
+	// 继续递归
+	_quickSort11(arr, l, p-1)
+	_quickSort11(arr, p+1, r)
+}
+
+// 找到选取的基准点该放的位置，也就是分界线
+func _partition11(arr []int, l, r int) int {
+	// 随机选基准点
+	baseIdx := rand.Intn(r-l+1) + l
+	// 将随机基准点交换至最左
+	arr[l], arr[baseIdx] = arr[baseIdx], arr[l]
+
+	//
+	base := arr[l]
+	i, j := l+1, l	// i当前位，j前一位
+	for i <= r {
+
+	}
+}

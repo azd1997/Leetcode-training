@@ -2,10 +2,10 @@ package lt9999
 
 import "fmt"
 
-[1,2,3,4,5,6,7]
-3
-[7,1,4,6,null,5,3,null,null,null,null,null,2]
-3
+//[1,2,3,4,5,6,7]
+//3
+//[7,1,4,6,null,5,3,null,null,null,null,null,2]
+//3
 
 // Definition for a binary tree node.
 type TreeNode struct {

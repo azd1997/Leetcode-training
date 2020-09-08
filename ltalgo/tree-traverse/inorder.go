@@ -70,7 +70,7 @@ func InOrderIterate2(root *TreeNode) []int {
 	for len(stack) != 0 || cur != nil { // cur != nil 其实就是递归过程中到了底部
 
 		//  只要当前节点不为空，始终将左子孙压入栈。
-		// 由于是前序遍历，因此需要在左子节点压栈之前处理当前结点（加入到arr数组）
+		// 由于是中序遍历，因此需要在左子节点压栈之后处理当前中间节点（加入到arr数组）
 		for cur != nil {
 			// 为了之后能够找到该节点的右子树，需要暂存该结点
 			stack = append(stack, cur)
